@@ -1,12 +1,12 @@
 # JDBC Module 8
 
 ## 📌 Description
-This project demonstrates working with a database using JDBC and PreparedStatement.
+This project demonstrates working with a database using JDBC, PreparedStatement, and Flyway migrations.
 
 The application:
-- creates a database
-- populates it with sample data
-- executes SQL queries (including parameterized ones)
+- automatically creates and updates the database using Flyway
+- performs CRUD operations for clients
+- executes parameterized SQL queries
 
 ---
 
@@ -14,42 +14,39 @@ The application:
 - Java
 - JDBC
 - H2 Database
+- Flyway
 - Gradle
 
 ---
 
 ## 📁 Project Structure
 
+### Migrations (Flyway)
+- db/migration/V1__init_db.sql — creates database tables
+- db/migration/V2__populate_db.sql — inserts initial data
+
+---
+
 ### SQL scripts
-- sql/init_db.sql — creates database tables
-- sql/populate_db.sql — inserts test data
 - sql/find_all_clients.sql — get all clients
 - sql/find_max_projects_client.sql — client with max projects
-- sql/find_client_by_id.sql — find client by ID (PreparedStatement)
-- sql/find_clients_by_name.sql — find clients by name (PreparedStatement)
-- sql/find_projects_by_client_id.sql — find projects by client ID (PreparedStatement)
+- sql/find_client_by_id.sql — find client by ID
+- sql/find_clients_by_name.sql — find clients by name
+- sql/find_projects_by_client_id.sql — find projects by client ID
 
 ---
 
 ### Java classes
 - Database — singleton for DB connection
-- DatabaseInitService — runs schema creation script
-- DatabasePopulateService — fills database with data
-- DatabaseQueryService — executes queries and maps results
-- Main — entry point for running examples
+- DatabaseQueryService — executes SELECT queries
+- ClientService — CRUD operations for clients
+- Main — entry point (runs Flyway and test queries)
 
 ---
 
 ## ▶ How to run
 
-1. Initialize database:  
-   run DatabaseInitService
-
-2. Populate data:  
-   run DatabasePopulateService
-
-3. Execute queries:  
-   run Main
+1. Run application:
 
 ---
 
@@ -63,13 +60,16 @@ MaxProjectCountClient{name='John Doe', projectCount=3}
 ---
 
 ## 💡 Features
+- Uses Flyway for database migrations
 - Uses PreparedStatement for parameterized queries
 - Prevents SQL injection
+- Implements CRUD operations for Client entity
 - Clean separation between SQL and Java code
-- Uses DTOs for mapping query results
 
 ---
 
 ## ⚠ Notes
-- H2 database files are excluded via .gitignore
-- SQL scripts are located in /sql  
+- H2 database is created automatically (`test.mv.db`)
+- Flyway applies migrations on application start
+- SQL scripts are located in `/sql`
+- Migration scripts are located in `/db/migration`  
