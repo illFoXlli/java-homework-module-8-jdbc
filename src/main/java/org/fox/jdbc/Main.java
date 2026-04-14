@@ -1,8 +1,40 @@
 package org.fox.jdbc;
+import org.flywaydb.core.Flyway;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
 
 public class Main {
-
     public static void main(String[] args) {
+
+        Properties props = new Properties();
+
+        try (InputStream is = Main.class
+                .getClassLoader()
+                .getResourceAsStream("application.properties")) {
+
+            if (is == null) {
+                throw new IllegalStateException("application.properties not found");
+            }
+
+            props.load(is);
+
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+
+        Flyway flyway = Flyway.configure()
+                .dataSource(
+                        props.getProperty("db.url"),
+                        props.getProperty("db.user"),
+                        props.getProperty("db.password")
+                )
+                .load();
+
+        flyway.migrate();
+
+
         DatabaseQueryService service = new DatabaseQueryService();
 
         System.out.println("=== CLIENT BY ID ===");
