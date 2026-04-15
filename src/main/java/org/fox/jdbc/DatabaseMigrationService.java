@@ -1,7 +1,6 @@
 package org.fox.jdbc;
 
 import org.flywaydb.core.Flyway;
-
 import java.util.Properties;
 
 public class DatabaseMigrationService {

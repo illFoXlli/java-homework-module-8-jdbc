@@ -1,7 +1,6 @@
 package org.fox.jdbc;
 
 import org.fox.jdbc.dto.Client;
-
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
