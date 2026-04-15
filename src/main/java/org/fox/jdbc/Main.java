@@ -26,13 +26,8 @@ public class Main {
         ClientService cs = new ClientService();
 
         System.out.println("=== CREATE CLIENT ===");
-
         long id = cs.create("Fox");
-
         System.out.println("Created client id: " + id);
-
-
-        DatabaseQueryService service = new DatabaseQueryService();
 
         System.out.println("\n=== GET BY ID ===");
         System.out.println(cs.getById(id));
