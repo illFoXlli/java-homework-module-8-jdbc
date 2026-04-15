@@ -1,10 +1,10 @@
 package org.fox.jdbc.dto;
 
 public class Client {
-    private int id;
+    private long id;
     private String name;
 
-    public Client(int id, String name) {
+    public Client(long id, String name) {
         this.id = id;
         this.name = name;
     }

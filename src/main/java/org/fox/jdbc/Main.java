@@ -13,38 +13,40 @@ public class Main {
         try (InputStream is = Main.class
                 .getClassLoader()
                 .getResourceAsStream("application.properties")) {
-
             if (is == null) {
                 throw new IllegalStateException("application.properties not found");
             }
-
             props.load(is);
-
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
 
-        Flyway flyway = Flyway.configure()
-                .dataSource(
-                        props.getProperty("db.url"),
-                        props.getProperty("db.user"),
-                        props.getProperty("db.password")
-                )
-                .load();
+        DatabaseMigrationService.migrate(props);
 
-        flyway.migrate();
+        ClientService cs = new ClientService();
+
+        System.out.println("=== CREATE CLIENT ===");
+
+        long id = cs.create("Fox");
+
+        System.out.println("Created client id: " + id);
 
 
         DatabaseQueryService service = new DatabaseQueryService();
 
-        System.out.println("=== CLIENT BY ID ===");
-        System.out.println(service.findClientById(1));
+        System.out.println("\n=== GET BY ID ===");
+        System.out.println(cs.getById(id));
 
-        System.out.println("\n=== CLIENTS BY NAME ===");
-        service.findClientsByName("John").forEach(System.out::println);
+        System.out.println("\n=== UPDATE ===");
+        cs.setName(id, "FoxUpdated");
+        System.out.println(cs.getById(id));
 
-        System.out.println("\n=== PROJECTS BY CLIENT ID ===");
-        service.findProjectsByClientId(1).forEach(System.out::println);
+        System.out.println("\n=== ALL CLIENTS ===");
+        cs.listAll().forEach(System.out::println);
+
+        System.out.println("\n=== DELETE ===");
+        cs.deleteById(id);
+        cs.listAll().forEach(System.out::println);
     }
 }
 
