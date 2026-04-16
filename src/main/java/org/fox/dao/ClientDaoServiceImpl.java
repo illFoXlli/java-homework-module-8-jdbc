@@ -2,6 +2,7 @@ package org.fox.dao;
 
 import org.fox.jdbc.Database;
 import org.fox.dto.Client;
+import org.fox.jdbc.SqlReader;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -9,19 +10,18 @@ import java.util.List;
 
 public class ClientDaoServiceImpl implements ClientDaoService {
 
-    private final Connection conn;
-
-    public ClientDaoServiceImpl() {
-        this.conn = Database.getInstance().getConnection();
-    }
+    private static final String CREATE_CLIENT_SQL = SqlReader.read("create_client.sql");
+    private static final String FIND_CLIENT_BY_ID_SQL = SqlReader.read("find_client_by_id.sql");
+    private static final String UPDATE_CLIENT_NAME_SQL = SqlReader.read("update_client_name.sql");
+    private static final String DELETE_CLIENT_BY_ID_SQL = SqlReader.read("delete_client_by_id.sql");
+    private static final String FIND_ALL_CLIENTS_SQL = SqlReader.read("find_all_clients.sql");
 
     @Override
     public long create(String name) {
         try {
-            String sql = "INSERT INTO client(name) VALUES (?)";
-
-            try (PreparedStatement stmt =
-                         conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            try (Connection conn = Database.getInstance().getConnection();
+                 PreparedStatement stmt =
+                         conn.prepareStatement(CREATE_CLIENT_SQL, Statement.RETURN_GENERATED_KEYS)) {
 
                 stmt.setString(1, name);
                 stmt.executeUpdate();
@@ -43,9 +43,8 @@ public class ClientDaoServiceImpl implements ClientDaoService {
     @Override
     public String getById(long id) {
         try {
-            String sql = "SELECT name FROM client WHERE id = ?";
-
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            try (Connection conn = Database.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(FIND_CLIENT_BY_ID_SQL)) {
 
                 stmt.setLong(1, id);
 
@@ -66,14 +65,16 @@ public class ClientDaoServiceImpl implements ClientDaoService {
     @Override
     public void setName(long id, String name) {
         try {
-            String sql = "UPDATE client SET name = ? WHERE id = ?";
-
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            try (Connection conn = Database.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(UPDATE_CLIENT_NAME_SQL)) {
 
                 stmt.setString(1, name);
                 stmt.setLong(2, id);
 
-                stmt.executeUpdate();
+                int updatedRows = stmt.executeUpdate();
+                if (updatedRows == 0) {
+                    throw new RuntimeException("Client not found");
+                }
             }
 
         } catch (SQLException e) {
@@ -84,13 +85,15 @@ public class ClientDaoServiceImpl implements ClientDaoService {
     @Override
     public void deleteById(long id) {
         try {
-            String sql = "DELETE FROM client WHERE id = ?";
-
-            try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            try (Connection conn = Database.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(DELETE_CLIENT_BY_ID_SQL)) {
 
                 stmt.setLong(1, id);
 
-                stmt.executeUpdate();
+                int updatedRows = stmt.executeUpdate();
+                if (updatedRows == 0) {
+                    throw new RuntimeException("Client not found");
+                }
             }
 
         } catch (SQLException e) {
@@ -103,9 +106,8 @@ public class ClientDaoServiceImpl implements ClientDaoService {
         List<Client> result = new ArrayList<>();
 
         try {
-            String sql = "SELECT id, name FROM client";
-
-            try (PreparedStatement stmt = conn.prepareStatement(sql);
+            try (Connection conn = Database.getInstance().getConnection();
+                 PreparedStatement stmt = conn.prepareStatement(FIND_ALL_CLIENTS_SQL);
                  ResultSet rs = stmt.executeQuery()) {
 
                 while (rs.next()) {

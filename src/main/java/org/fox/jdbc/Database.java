@@ -10,30 +10,31 @@ import java.util.Properties;
 public class Database {
 
     private static Database instance;
-    private Connection connection;
+    private final String url;
+    private final String user;
+    private final String password;
 
     private Database() {
-        try {
+        String propertiesFileName = System.getProperty("app.config", "application.properties");
+
+        try (InputStream input = Database.class
+                .getClassLoader()
+                .getResourceAsStream(propertiesFileName)) {
+
             Properties props = new Properties();
 
-            InputStream input = Database.class
-                    .getClassLoader()
-                    .getResourceAsStream("application.properties");
-
             if (input == null) {
-                throw new RuntimeException("Файл application.properties не найден");
+                throw new RuntimeException("Файл " + propertiesFileName + " не найден");
             }
 
             props.load(input);
 
-            String url = props.getProperty("db.url");
-            String user = props.getProperty("db.user");
-            String password = props.getProperty("db.password");
+            url = props.getProperty("db.url");
+            user = props.getProperty("db.user");
+            password = props.getProperty("db.password");
 
-            connection = DriverManager.getConnection(url, user, password);
-
-        } catch (IOException | SQLException e) {
-            throw new RuntimeException("Ошибка подключения к БД", e);
+        } catch (IOException e) {
+            throw new RuntimeException("Ошибка чтения настроек БД", e);
         }
     }
 
@@ -44,7 +45,7 @@ public class Database {
         return instance;
     }
 
-    public Connection getConnection() {
-        return connection;
+    public Connection getConnection() throws SQLException {
+        return DriverManager.getConnection(url, user, password);
     }
 }

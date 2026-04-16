@@ -9,6 +9,14 @@ public class Client {
         this.name = name;
     }
 
+    public long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
     @Override
     public String toString() {
         return id + " - " + name;

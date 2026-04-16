@@ -11,6 +11,18 @@ public class Project {
         this.clientId = clientId;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getClientId() {
+        return clientId;
+    }
+
     @Override
     public String toString() {
         return id + " | " + name + " | clientId=" + clientId;

@@ -10,6 +10,14 @@ public class MaxProjectCountClient {
         this.projectCount = projectCount;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public int getProjectCount() {
+        return projectCount;
+    }
+
     @Override
     public String toString() {
         return name + " - " + projectCount;
