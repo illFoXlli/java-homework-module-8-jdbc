@@ -1,4 +1,4 @@
-package org.fox.jdbc.dto;
+package org.fox.dto;
 
 public class Project {
     private int id;

@@ -1,4 +1,10 @@
-package org.fox.jdbc;
+package org.fox;
+
+import org.fox.dao.ClientDaoService;
+import org.fox.dao.ClientDaoServiceImpl;
+import org.fox.jdbc.DatabaseMigrationService;
+import org.fox.service.ClientService;
+import org.fox.service.ClientServiceImpl;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,17 +18,24 @@ public class Main {
         try (InputStream is = Main.class
                 .getClassLoader()
                 .getResourceAsStream("application.properties")) {
+
             if (is == null) {
                 throw new IllegalStateException("application.properties not found");
             }
+
             props.load(is);
+
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
 
         DatabaseMigrationService.migrate(props);
 
-        ClientService cs = new ClientService();
+        ClientDaoService dao = new ClientDaoServiceImpl();
+
+        ClientService cs = new ClientServiceImpl(dao);
+
+
 
         System.out.println("=== CREATE CLIENT ===");
         long id = cs.create("Fox");
@@ -43,5 +56,3 @@ public class Main {
         cs.listAll().forEach(System.out::println);
     }
 }
-
-
